@@ -46,6 +46,7 @@ This project contains the codebase for c2x
     python3 -m imp_core.imp_cv_listener
     ```
 
+Note: For Step 3: Please make sure your public IP is whitelisted in imp-lite (if that is used as the imp server)
 
 ### Docker
 The testapp can be run as a docker container
