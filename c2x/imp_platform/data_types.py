@@ -6,6 +6,7 @@ class ImageDetection(Enum):
     traffic_light = 'traffic_light'
     traffic_sign = 'traffic_sign'
     vehicle = 'vehicle'
+    traffic_cone = "traffic_cone"
 
     def __str__(self):
         return self.value

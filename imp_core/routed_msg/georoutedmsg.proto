@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+package georoutedmsg;
+
+option go_package = "./proto-gen/georoutedmsg;georoutedmsg";
+
+message Position {
+  double latitude = 1; 
+  double longitude = 2; 
+}
+
+message GeoRoutedMsg {
+  bytes msgBytes = 1;
+  google.protobuf.Timestamp time = 2;
+  Position position = 3;
+}

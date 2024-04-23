@@ -17,28 +17,35 @@ This project contains the codebase for c2x
 1. Install the requirements (one time)
 
     ```bash
-    python -m pip install -r .\requirements.txt
+    python3 -m pip install -r .\requirements.txt
     ```
 2. Run the test script from one level above this dir
 
     ```bash
-    python -m c2x.test -v {path to video}
+    python3 -m c2x.test -v {path to video}
     ```
 
     e.g.:
     For camera input (cam idx 0):
     ```bash
-    python -m c2x.test -v 0
+    python3 -m c2x.test -v 0
     ```
     For video/stream input:
     ```bash
-    python -m c2x.test -v 'http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg
+    python3 -m c2x.test -v 'http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg
     ```
 
     To get help on available options, run:
     ```bash
-    python -m c2x.test --help
+    python3 -m c2x.test --help
     ```
+    
+3. Run the imp listener (and publisher)
+
+    ```bash
+    python3 -m imp_core.imp_cv_listener
+    ```
+
 
 ### Docker
 The testapp can be run as a docker container
