@@ -103,7 +103,8 @@ class MqttVzModeClient(threading.Thread):
         while (True):
             routed_msg = self.get_bsm_message()
             token = self.vzmode_mqtt_client.publish(self.MQTT_BSM_UPER, routed_msg, qos=0, retain=False)
-            print(f"Published: Token is: {token}")
+            # print(f"\rPublished: Token is: {token}")
+            sys.stdout.write(f"\rPublished: Token is: {token}")
             time.sleep(0.1)
 
     def publish_rsa(self):
