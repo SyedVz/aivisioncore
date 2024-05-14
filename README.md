@@ -38,7 +38,7 @@ This project contains the codebase for c2x
     ```
     For video/stream input:
     ```bash
-    python3 -m c2x.test -v 'http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg
+    python3 -m c2x.test -v 'http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg --imp
     ```
 
     To get help on available options, run:
