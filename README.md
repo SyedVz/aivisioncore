@@ -19,6 +19,12 @@ This project contains the codebase for c2x
     ```bash
     python3 -m pip install -r .\requirements.txt
     ```
+
+    For CV2X, some libraries are different from the above. So, in a separate python environment install cv2x imp requirements
+     ```bash
+    python3 -m pip install -r .\requirements_imp.txt
+    ```
+
 2. Run the test script from one level above this dir
 
     ```bash
@@ -40,13 +46,17 @@ This project contains the codebase for c2x
     python3 -m c2x.test --help
     ```
     
-3. Run the imp listener (and publisher)
+3. Start the car (to publish bsms and to listen to vision events)
 
     ```bash
-    python3 -m imp_core.imp_cv_listener
+    python3 -m imp_core.start_driving
     ```
 
-Note: For Step 3: Please make sure your public IP is whitelisted in imp-lite (if that is used as the imp server)
+Note: For Step 3: 
+    (a) If using imp-lite, please make sure your public IP is whitelisted in imp-lite (if that is used as the imp server)
+    (b) If using vzmode, make sure you are connected to a 5G network (or through a 5G hotspot)
+    (c) For vzmode, you can monitor the car's movement in the following link:
+        http://vzmode.las.wl.dltdemo.io:30888/
 
 ### Docker
 The testapp can be run as a docker container
