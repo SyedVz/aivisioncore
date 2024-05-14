@@ -10,7 +10,7 @@ import sys, time, threading, abc, signal
 from threading import Event
 from google.protobuf import timestamp_pb2
 
-import routed_msg_pb2
+import imp_core.routed_msg_vzmode.routed_msg_pb2 as routed_msg_pb2
 from .rsa_msg_helper import Rsa_Helper
 from .location_helper import Location_Helper
 

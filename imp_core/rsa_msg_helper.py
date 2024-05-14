@@ -1,7 +1,7 @@
 import time
 from datetime import datetime, timedelta, timezone
 
-import routed_msg_pb2
+import imp_core.routed_msg_vzmode.routed_msg_pb2 as routed_msg_pb2
 from google.protobuf import timestamp_pb2
 
 class Rsa_Helper:
