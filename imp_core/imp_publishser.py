@@ -11,7 +11,7 @@ import paho.mqtt.subscribe as mqtt_subscribe
 
 from .routed_msg import georoutedmsg_pb2
 
-class MqttClient(threading.Thread):
+class MqttIMPClient(threading.Thread):
     def __init__(self, stop_event):
 
         super().__init__(group=None, name='imp_mqtt_client_test')
@@ -35,7 +35,7 @@ class MqttClient(threading.Thread):
         self.vzmode_mqtt_client.on_message = self.on_message
         self.vzmode_mqtt_client.on_subscribe = self.on_subscribe
         self.vzmode_mqtt_client.on_disconnect = self.on_disconnect
-        print("MqttClient Init Complete")
+        print("MqttIMPClient Init Complete")
 
     def send_message(self, msg):
         self.msg_q.put(msg)

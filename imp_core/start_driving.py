@@ -2,10 +2,10 @@ import socket
 import threading
 import time
 import queue
-from .imp_publishser import MqttIMPClient
+from .vzmode_interface import MqttVzModeClient
 from threading import Event
 
-class UDPServer:
+class MyCar:
     def __init__(self, stop_event):
         self.localIP     = "127.0.0.1"
         self.localPort   = 6161
@@ -49,14 +49,15 @@ class UDPServer:
             time.sleep(0.1)
 
     def create_mqtt_client(self):
-        self.mqtt_client = MqttIMPClient(self.stop_event)
+        # Creation of this client also starts sending BSMs messages
+        self.mqtt_client = MqttVzModeClient(self.stop_event)
 
          # mqtt_client.setDaemon(True)
         self.mqtt_client.start()
 
 def main(): 
     main_stop_event = Event()
-    udpServer = UDPServer(main_stop_event)
+    my_car = MyCar(main_stop_event)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package routedmsgpb;
+
+
+message Position {
+  int32 latitude = 1; // in 1/10th microdegrees [-900000000,900000001]
+  int32 longitude = 2; // in 1/10th microdegrees [-1799999999,1800000001]
+}
+
+
+message ClientIdentity {
+  uint32 clientId = 1;
+  string entityType = 2;
+}
+
+
+message RoutedMsg {
+  bytes msgBytes = 1;
+  google.protobuf.Timestamp time = 2; // in UTC time
+  Position position = 3;
+  // optional...only applies to some types of messages
+  uint32 customRadiusOpt = 4;  
+  bool clientCanOverrideRadiusOpt = 5; // only applies if customRadiusOpt is set
+  repeated ClientIdentity clientIdsOpt = 6;  // if specified, these are the
+                                             // potential clients to receive the message,
+                                             // rather than those within a geofence
+}
+
+
+message AutoPublishAddMsg {
+  bytes msgBytes = 1;
+  string msgType = 2; // such as "TIM", "RSA", etc
+  string id = 3; // must just be unique for the publishing client for the given
+                 // msgType
+  string description = 11;
+  repeated string entityTypes = 12; // optional, to publish to certain
+                                    // EntityTypes and not others; if
+                                    // empty it implies send to everyone
+  // the next 4 fields pertain to messages that should be delivered to everyone  
+  // within a radius at some periodicity
+  Position positionOpt = 4;
+  uint32 customRadiusOpt = 5; // optional;
+  bool clientCanOverrideRadiusOpt = 6; // only applies if customRadiusOpt is set
+  uint32 frequencySecOpt = 7;
+ 
+  google.protobuf.Timestamp startTime = 8; // just set to current time if it’s
+                                           // not in the future
+  google.protobuf.Timestamp endTime = 9; // this should be set within 24 hours of
+                                         // startTime
+  // if LineCrossing is defined then deliver messages to
+  // anyone crossing that line
+  LineCrossing lineCrossingOpt = 10;
+}
+
+
+message LineCrossing {
+  Position endpoint1 = 1;
+  Position endpoint2 = 2;
+  string roadIdentifier = 3;
+  enum Direction {
+    Undefined = 0;  
+    NB = 1;
+    EB = 2;
+    SB = 3;
+    WB = 4;
+  }
+  Direction direction = 4;
+}
+
+
+// this is the message a client should publish to remove an Autopublished Message
+// that it added
+message AutoPublishDeleteMsg {
+  string id = 1;
+  string msgType = 2; // such as "TIM", "RSA", etc
+}
+
+
+// acknowledgment for the AutoPublishAddMsg
+message AutoPublishAddAck {
+  string msgType = 1; // such as "TIM", "RSA", etc
+  string id = 2;
+  string msgDescription = 5; // matches 'description' from original AutoPublishAddMsg
+  bool success = 3;
+  string failMsg = 4; // only set in case of failure
+}
+
+
+// acknowledgment for the AutoPublishDeleteMsg
+message AutoPublishDeleteAck {
+  string msgType = 1; // such as "TIM", "RSA", etc
+  string id = 2;
+  string msgDescription = 5; // matches 'description' from original AutoPublishAddMsg
+  bool success = 3;
+  string failMsg = 4; // only set in case of failure
+}
+
+
+// acknowledgment for the request to delete all messages for the client (which has no associated Protobuf)
+message AutoPublishDeleteAllAck {
+  bool success = 1;
+  string failMsg = 2; // only set in case of failure
+  repeated string ids = 3;
+}
+
+
+// response to client that a message started (applies both to messages that were scheduled and to messages that were started immediately)
+message AutoPublishStarted {
+  string msgType = 1; // such as "TIM", "RSA", etc
+  string id = 2;
+  string msgDescription = 3; // matches 'description' from original AutoPublishAddMsg
+}
+
+
+// response to client that a message stopped (applies both to messages that expired and to messages that were stopped immediately)
+message AutoPublishStopped {
+  string msgType = 1; // such as "TIM", "RSA", etc
+  string id = 2;
+  string msgDescription = 3; // matches 'description' from original AutoPublishAddMsg
+}
+
+
+message OutboundMsg {
+  ClientIdentity clientIdentity = 1; // identifies the publisher
+  google.protobuf.Timestamp time = 2; // in UTC time
+  bytes msgBytes = 3;
+}
+
