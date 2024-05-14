@@ -4,6 +4,7 @@ import time
 from datetime import datetime, timedelta, timezone
 import mycodec as mycodec
 import json
+import queue
 from collections import deque
 
 import sys, time, threading, abc, signal
@@ -20,6 +21,7 @@ class MqttVzModeClient(threading.Thread):
 
         super().__init__(group=None, name="vzmode_python_mkz_car")
         self.evt = stop_event
+        self.msg_q = queue.Queue()
 
         self.vzmode_mqtt_client = None
         self.vz_mode_mqtt_broker_address = "vzmode.las.wl.dltdemo.io"
@@ -56,6 +58,30 @@ class MqttVzModeClient(threading.Thread):
 
         print("MqttVzModeClient Init Complete")
 
+    def send_message(self, msg):
+        self.msg_q.put(msg)
+
+    def genAI_CV2X_msg_loop(self):
+        while(True):
+            try:
+                msg = self.msg_q.get(timeout=1.0/60)
+                if (self.vz_mode_mqtt_is_connected):
+                    print(f"Processing msg: {msg}")
+                    self.process_genAI_CV2X_msgs(msg)
+                else:
+                    print(f"GenAI message {msg} But IMP not connected")
+                # Publish this message based on its type etc
+            except queue.Empty:
+                print("Empty message queue")
+                pass
+            except Exception as e:
+                print(f"Error processing message queue {e}")
+        
+            time.sleep(0.1) 
+
+    def process_genAI_CV2X_msgs(self, msg):
+        pass
+
     def is_connected(self):
         return self.vz_mode_mqtt_is_connected
 
@@ -83,9 +109,11 @@ class MqttVzModeClient(threading.Thread):
     def run(self):
         try:
 
-            self.vzmode_mqtt_client.connect(
-                self.vz_mode_mqtt_broker_address, port=self.vz_mode_mqtt_broker_port
-            )  # connect to broker
+             # Start a thread to process incoming messages from GenAI
+            threading.Thread(target=self.genAI_CV2X_msg_loop).start()
+
+            # Connect to VzMode
+            self.vzmode_mqtt_client.connect(self.vz_mode_mqtt_broker_address, port=self.vz_mode_mqtt_broker_port)  # connect to broker
             self.vzmode_mqtt_client.loop_start()  # start the loop
 
         except ConnectionResetError:
