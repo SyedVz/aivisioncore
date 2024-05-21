@@ -1,5 +1,6 @@
 from .data_types import ImageDetection
 from .data_types import DetectionExtents
+from .data_types import IncidentsName
 import socket
 
 class IMPClient:
@@ -22,9 +23,25 @@ class IMPClient:
 
         detected_object = "None"
         if (type):
-            detected_object = type.__str__
-          
+            detected_object = type.value
+           # print('******************************************')
+           # print(detected_object)
+           # print('******************************************')
+
         if (self.UDPClientSocket) :
-            self.UDPClientSocket.sendto(str.encode(detected_object), self.serverAddressPort)
+            self.UDPClientSocket.sendto(detected_object.encode(), self.serverAddressPort)
+
+        return True
+
+    def send_incident_detection(self, type :IncidentsName, cameraname):
+        print(f'Sending incident detection: {type} ')
+
+        detected_incident = "None"
+        if (type):
+            detected_incident = type.value
+
+
+        if (self.UDPClientSocket) :
+            self.UDPClientSocket.sendto(detected_incident.encode(), self.serverAddressPort)
 
         return True
