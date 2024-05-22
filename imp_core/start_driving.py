@@ -5,6 +5,9 @@ import queue
 from .vzmode_interface import MqttVzModeClient
 from threading import Event
 
+import requests
+import json
+
 class MyCar:
     def __init__(self, stop_event):
         self.localIP     = "127.0.0.1"
@@ -49,11 +52,35 @@ class MyCar:
             time.sleep(0.1)
 
     def create_mqtt_client(self):
+
+        # First register to get the client ID
+        client_id = self.register_client()
+
         # Creation of this client also starts sending BSMs messages
-        self.mqtt_client = MqttVzModeClient(self.stop_event)
+        self.mqtt_client = MqttVzModeClient(self.stop_event, client_id)
 
          # mqtt_client.setDaemon(True)
         self.mqtt_client.start()
+
+    def register_client(self) -> int:
+    
+        client_entity_id = 0
+        vz_mode_crs_url = "http://vzmode.las.wl.dltdemo.io:30413/registration"
+
+        try:
+            client_data = { "ClientInformation":{ "EntityType":"VEH", "EntitySubtype":"PSGR", "VendorID":"MCAS" }, "BSM":{ "MsgFormat":"UPER" }, "RSA":{ "MsgFormat":"UPER" }, "PSM":{ "MsgFormat":"UPER" }, "MAP":{ "MsgFormat":"UPER" }, "SPAT":{ "MsgFormat":"UPER" } }
+            headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+            r = requests.post(vz_mode_crs_url, data=json.dumps(client_data), headers=headers)
+            js = json.loads(r.text)
+            client_entity_id = js.get('ID') # the json response is of format {"ID": 9}
+            print("Registration of Client successful...")
+            print(f"Entity ID is: {client_entity_id}")
+
+        except:
+            print("Failed to register the vzmode client")
+
+        return client_entity_id
+    
 
 def main(): 
     main_stop_event = Event()

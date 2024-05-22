@@ -15,24 +15,35 @@ import imp_core.routed_msg_vzmode.routed_msg_pb2 as routed_msg_pb2
 from .rsa_msg_helper import Rsa_Helper
 from .location_helper import Location_Helper
 
+default_entity_id = 200             # Used if not registering the client
 
 class MqttVzModeClient(threading.Thread):
-    def __init__(self, stop_event):
+    def __init__(self, stop_event, client_id=0):
 
         super().__init__(group=None, name="vzmode_python_mkz_car")
         self.evt = stop_event
         self.msg_q = queue.Queue()
 
+        if (client_id != 0):
+            self.entity_id = client_id
+        else:
+            self.entity_id =  default_entity_id
+
         self.vzmode_mqtt_client = None
         self.vz_mode_mqtt_broker_address = "vzmode.las.wl.dltdemo.io"
         self.vz_mode_mqtt_broker_port = 31234
         self.vz_mode_mqtt_is_connected = False
+        self.vz_mode_crs_url = "http://vzmode.las.wl.dltdemo.io:30413/registration"
 
         # Pub topics
-        self.MQTT_BSM_UPER = "VZCV2X/3/IN/VEH/PSGR/MCAS/200/UPER/BSM"
+        self.MQTT_BSM_UPER = f"VZCV2X/3/IN/VEH/PSGR/MCAS/{self.entity_id}/UPER/BSM"
         self.MQTT_RSA = "VZCV2X/3/IN/SW/NA/ADOT/0/JER/AUTOPUB_ADD"
 
-        self.vzmode_mqtt_client = mqtt_client.Client(client_id="adot_python_user")
+        # Sub Topics
+        self.MQTT_RSA_SUB = f"VZCV2X/3/OUT/VEH/PSGR/MCAS/{self.entity_id}/UPER/RSA"
+        self.MQTT_RSA_EMER_SUB = f"VZCV2X/3/OUT/VEH/PSGR/MCAS/{self.entity_id}/UPER/RSA_EMER"
+
+        self.vzmode_mqtt_client = mqtt_client.Client(client_id=f"VEH-{self.entity_id}")
         self.vzmode_mqtt_client.username_pw_set("adot_user", "9rmcWLxlxe")
         self.vzmode_mqtt_client.on_connect = self.on_connect
         self.vzmode_mqtt_client.on_message = self.on_message
@@ -72,7 +83,7 @@ class MqttVzModeClient(threading.Thread):
                     print(f"GenAI message {msg} But IMP not connected")
                 # Publish this message based on its type etc
             except queue.Empty:
-                print("Empty message queue")
+                # print("Empty message queue")
                 pass
             except Exception as e:
                 print(f"Error processing message queue {e}")
@@ -90,22 +101,38 @@ class MqttVzModeClient(threading.Thread):
             print("Connected to LAS Vzmode")
             self.vz_mode_mqtt_is_connected = True
             threading.Thread(target=self.publish_bsm).start()
+            self.vzmode_mqtt_client.subscribe(self.MQTT_RSA_SUB, 0)
+            self.vzmode_mqtt_client.subscribe(self.MQTT_RSA_EMER_SUB, 0)
         else:
             print("Connection failed")
 
-    def on_disconnect(self, client, userdata, flags, rc):
+    def on_disconnect(self, client, userdata, flags):
         print("disconnected")
         self.vz_mode_mqtt_is_connected = False
 
     def on_subscribe(self, mosq, obj, mid, granted_qos):
-        print("Subscribed to Topic: " + str(granted_qos))
+        print("Subscribed to Topic: " + str(mid) + " " + str(granted_qos))
 
     def on_message(self, mosq, obj, msg):
-        print("Message received")
-        print("Topic: " + str(msg.topic))
+        # print("Message received")
+        # print("Topic: " + str(msg.topic))
         # print("QoS: " + str(msg.qos))
         # print("Payload: " + str(msg.payload))
+        msg_type = self.message_type(str(msg.topic)).upper()
+        if (msg_type == "BSM"):
+            sys.stdout.write(".")
+            sys.stdout.flush()
+        elif (msg_type == "RSA"):
+            print()
+            print(f"RSA message received{str(msg.topic)}") 
+        else:
+            print()
+            print(str(msg.topic))   
 
+    def message_type(self, topic) -> str:
+        arr = topic.split("/")
+        return arr[-1]
+    
     def run(self):
         try:
 
@@ -132,7 +159,7 @@ class MqttVzModeClient(threading.Thread):
             routed_msg = self.get_bsm_message()
             token = self.vzmode_mqtt_client.publish(self.MQTT_BSM_UPER, routed_msg, qos=0, retain=False)
             # print(f"\rPublished: Token is: {token}")
-            sys.stdout.write(f"\rPublished: Token is: {token}")
+            # sys.stdout.write(f"\rPublished: Token is: {token}")
             time.sleep(0.1)
 
     def publish_rsa(self):
@@ -144,8 +171,9 @@ class MqttVzModeClient(threading.Thread):
         print(f"Published: Token is: {token}")
 
     def get_bsm_message(self):
+        id = "%0.8X" % self.entity_id
         # base bsm_msg to build the actual message from
-        bsm_msg = {"messageId": 20, "value": {"coreData": {"msgCnt": 34, "id": "000000C8", "secMark": 36618, "lat": 373815394, "long": -1219919597, "elev": -4096, "accuracy": {"semiMajor": 255, "semiMinor": 255, "orientation": 65535}, "transmission": "unavailable", "speed": 0, "heading": 24165, "angle": 127, "accelSet": {"long": 2001, "lat": 2001, "vert": -127, "yaw": 0}, "brakes": {"wheelBrakes": {"length": 5, "value": "00"}, "traction": "unavailable", "abs": "unavailable", "scs": "unavailable", "brakeBoost": "unavailable", "auxBrakes": "unavailable"}, "size": {"width": 200, "length": 599}}}}
+        bsm_msg = {"messageId": 20, "value": {"coreData": {"msgCnt": 34, "id": id, "secMark": 36618, "lat": 373815394, "long": -1219919597, "elev": -4096, "accuracy": {"semiMajor": 255, "semiMinor": 255, "orientation": 65535}, "transmission": "unavailable", "speed": 0, "heading": 24165, "angle": 127, "accelSet": {"long": 2001, "lat": 2001, "vert": -127, "yaw": 0}, "brakes": {"wheelBrakes": {"length": 5, "value": "00"}, "traction": "unavailable", "abs": "unavailable", "scs": "unavailable", "brakeBoost": "unavailable", "auxBrakes": "unavailable"}, "size": {"width": 200, "length": 599}}}}
 
         bsm_msg["value"]["coreData"]["msgCnt"] = self.location_helper.msgCnt
         bsm_msg["value"]["coreData"]["lat"] = self.location_helper.lat

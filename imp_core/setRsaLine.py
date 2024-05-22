@@ -37,12 +37,16 @@ class MqttClient(threading.Thread):
         if rc == 0:    
             print("Connected to LAS Vzmode")   
             self.publish_rsa()
- 
+            # All done. Now disconnect
+            self.vzmode_mqtt_client.disconnect()
         else:
             print("Connection failed")
 
-    def on_disconnect(self, client, userdata, flags, rc):
-        print("disconnected")
+    def on_disconnect(self, client, userdata, flags):
+        print("MQTT disconnected")
+        print("Exiting...")
+        self.vzmode_mqtt_client.loop_stop()
+        self.evt.set()
 
     def on_subscribe(self, mosq, obj, mid, granted_qos):
         print("Subscribed to Topic: " + str(granted_qos))
@@ -174,7 +178,7 @@ def setRsaLine(lineId:str, endPoints, jsonRsa:str) -> bytes:
 
     now_time = datetime.now()
     # datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0) 
-    msg_end_time = now_time + timedelta(minutes=2) 
+    msg_end_time = now_time + timedelta(minutes=5) 
      
     # utc_now_time = now_time.replace(tzinfo=timezone.utc)
     # utc_msg_end_time = msg_end_time.replace(tzinfo=timezone.utc)
