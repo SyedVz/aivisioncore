@@ -12,7 +12,7 @@ class IMPClient:
         self.car_port = 6161
 
         self.rsu_address_port     = (self.host, self.rsu_port)
-        self.car_address_port     = (self.host, self.rsu_port)
+        self.car_address_port     = (self.host, self.car_port)
 
         self.bufferSize  = 1024
 
@@ -66,7 +66,6 @@ class IMPClient:
 
         cv_data = {"Incident": detected_incident, "cam_pos": cam_pos}
     
-        
         if (self.UDPClientSocket) :
             self.UDPClientSocket.sendto(json.dumps(cv_data).encode(), server_address_port)
 
