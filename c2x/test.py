@@ -56,15 +56,22 @@ def is_imp_supported(cls):
 def yolo_class_to_imp(cls):
     if cls == 'person':
         return ImageDetection.pedestrian
-    elif cls in ['bicycle', 'car', 
-                   'motorcycle', 'bus', 
-                   'train', 'truck']:
+    elif cls== 'truck':
         return ImageDetection.vehicle
     elif cls == 'traffic_light':
         return ImageDetection.traffic_light
     elif cls in ['stop sign']:
         return ImageDetection.traffic_sign
 
+def clip_class_to_imp(cls):
+    if cls == 'person':
+        return ImageDetection.pedestrian
+    elif cls== 'truck':
+        return ImageDetection.vehicle
+    elif cls == 'traffic_light':
+        return ImageDetection.traffic_light
+    elif cls in ['stop sign']:
+        return ImageDetection.traffic_sign
 
 def load_gateway_vars():
     # TODO: Update these if env var names are changed by Thingspace
@@ -261,7 +268,7 @@ def main(args):
         disp_buffer = screen.copy()
         # Set the window title
         pygame.display.set_caption(wnd_name)
-
+    prev_c = 0
     while not exit_flag.is_set():
         tstart = time.process_time()
 
@@ -298,7 +305,13 @@ def main(args):
 
             if imp_enabled and imp_client.is_valid() and is_imp_supported(c):
                 # TODO: Only send limited detections/when detection changes
-                imp_client.send_image_detection(yolo_class_to_imp(c), DetectionExtents(*b))
+                if(prev_c != c):
+                    print(c)
+                    print(prev_c)
+                    imp_client.send_image_detection(yolo_class_to_imp(c), DetectionExtents(*b))
+                    prev_c =c
+                else:
+                    break
 
             if headless and not save_output:
                 continue

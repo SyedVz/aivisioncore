@@ -9,7 +9,7 @@ class ImageDetection(Enum):
     traffic_cone = "traffic_cone"
 
     def __str__(self):
-        return self.value
+        return f'{self.value}'
     
 
 class DetectionExtents:
@@ -18,3 +18,14 @@ class DetectionExtents:
         self.y = y
         self.w = w
         self.h = h
+
+
+class IncidentsName(Enum):
+    explosion = 'explosion'
+    accident = 'accident'
+    violation = 'violation'
+    notmatching = 'not matching'
+    constructionzone = "construction zone"
+
+    def __str__(self):
+        return f'{self.value}'
