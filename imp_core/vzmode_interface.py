@@ -99,10 +99,10 @@ class MqttVzModeClient(threading.Thread):
         if (not cam_pos):
             cam_pos = {}
             # it means its in car. Need to get location info
-            cam_pos['lat_start'] =  self.location_helper.lat
-            cam_pos['long_start'] =  self.location_helper.long
-            cam_pos['lat_end'] =  self.location_helper.lat
-            cam_pos['long_end'] =  self.location_helper.long
+            cam_pos['lat_start'] =  self.location_helper.lat + 20
+            cam_pos['long_start'] =  self.location_helper.long + 20
+            cam_pos['lat_end'] =  self.location_helper.lat - 20
+            cam_pos['long_end'] =  self.location_helper.long -20
 
         incident = jsob_obj.get('Incident', '')
 

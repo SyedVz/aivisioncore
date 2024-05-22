@@ -26,10 +26,11 @@ class MyCar:
         self.msg_q = queue.Queue()
         self.stop_event = stop_event
 
-        # # Create a datagram socket
-        # self.UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        # # Bind to address and ip
-        # self.UDPServerSocket.bind((self.localIP, self.localPort))
+        if (cv_connect):
+            # # Create a datagram socket
+            self.UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+            # # Bind to address and ip
+            self.UDPServerSocket.bind((self.localIP, self.localPort))
 
         # Class for registering and sending messages to VzMode mqtt
         self.create_mqtt_client()
@@ -106,7 +107,7 @@ class MyCar:
 def main(args): 
     try:
         main_stop_event = Event()
-        my_car = MyCar(main_stop_event, )
+        my_car = MyCar(main_stop_event, args.cv_connect)
     except KeyboardInterrupt:
         print('Interrupted')
         try:
