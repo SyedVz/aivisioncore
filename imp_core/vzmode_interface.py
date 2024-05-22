@@ -18,9 +18,9 @@ from .location_helper import Location_Helper
 default_entity_id = 200             # Used if not registering the client
 
 class MqttVzModeClient(threading.Thread):
-    def __init__(self, stop_event, client_id=0):
+    def __init__(self, stop_event, client_id=0, thread_name="vzmode_rsu"):
 
-        super().__init__(group=None, name="vzmode_python_mkz_car")
+        super().__init__(group=None, name=thread_name)
         self.evt = stop_event
         self.msg_q = queue.Queue()
 
@@ -53,19 +53,19 @@ class MqttVzModeClient(threading.Thread):
         self.location_helper = Location_Helper(stop_event)
 
         # Load BSM data from file
-        self.saved_car_route = None
-        self.saved_car_route_2 = None
-        self.saved_car_route_len = 0
+        # self.saved_car_route = None
+        # self.saved_car_route_2 = None
+        # self.saved_car_route_len = 0
 
-        self.telemetry_file = "telemetry_input_arizona.csv"
+        # self.telemetry_file = "telemetry_input_arizona.csv"
 
-        with open (self.telemetry_file) as f:
-            self.saved_car_route = f.readlines()
-            del self.saved_car_route[0]    # Delete the row with col titles
-            self.saved_car_route_len = len(self.saved_car_route)
-            dq = deque(self.saved_car_route)
-            # dq.rotate(500)                 # Just rotate the data to use for the second car
-            self.saved_car_route_2 = list(dq)
+        # with open (self.telemetry_file) as f:
+        #     self.saved_car_route = f.readlines()
+        #     del self.saved_car_route[0]    # Delete the row with col titles
+        #     self.saved_car_route_len = len(self.saved_car_route)
+        #     dq = deque(self.saved_car_route)
+        #     # dq.rotate(500)                 # Just rotate the data to use for the second car
+        #     self.saved_car_route_2 = list(dq)
 
         print("MqttVzModeClient Init Complete")
 
@@ -77,7 +77,7 @@ class MqttVzModeClient(threading.Thread):
             try:
                 msg = self.msg_q.get(timeout=1.0/60)
                 if (self.vz_mode_mqtt_is_connected):
-                    print(f"Processing msg: {msg}")
+                    # print(f"Processing msg: {msg}")
                     self.process_genAI_CV2X_msgs(msg)
                 else:
                     print(f"GenAI message {msg} But IMP not connected")
@@ -91,7 +91,37 @@ class MqttVzModeClient(threading.Thread):
             time.sleep(0.1) 
 
     def process_genAI_CV2X_msgs(self, msg):
-        pass
+        json_str = msg.decode('utf-8')
+        jsob_obj = json.loads(json_str)
+
+        cam_pos = jsob_obj.get('cam_pos', None)
+
+        if (not cam_pos):
+            cam_pos = {}
+            # it means its in car. Need to get location info
+            cam_pos['lat_start'] =  self.location_helper.lat
+            cam_pos['long_start'] =  self.location_helper.long
+            cam_pos['lat_end'] =  self.location_helper.lat
+            cam_pos['long_end'] =  self.location_helper.long
+
+        incident = jsob_obj.get('Incident', '')
+
+        rsa_id = "GenAI Incident: "
+        if (incident == "explosion"):
+            rsa_id = rsa_id + incident
+        elif (incident == "accident"):
+            rsa_id = rsa_id + incident
+        elif (incident == "violation"):
+            rsa_id = rsa_id + incident
+        elif (incident == "construction zone"):
+            rsa_id = rsa_id + incident
+        else:
+            rsa_id = rsa_id + "Unknown"
+
+        # print(cam_pos)
+        # print(incident)
+        print(f"Setting RSA line for the incident: {incident}")
+        self.publish_rsa(rsa_id, rsa_id, cam_pos)
 
     def is_connected(self):
         return self.vz_mode_mqtt_is_connected
@@ -100,7 +130,7 @@ class MqttVzModeClient(threading.Thread):
         if rc == 0:
             print("Connected to LAS Vzmode")
             self.vz_mode_mqtt_is_connected = True
-            threading.Thread(target=self.publish_bsm).start()
+            # threading.Thread(target=self.publish_bsm).start()
             self.vzmode_mqtt_client.subscribe(self.MQTT_RSA_SUB, 0)
             self.vzmode_mqtt_client.subscribe(self.MQTT_RSA_EMER_SUB, 0)
         else:
@@ -162,8 +192,9 @@ class MqttVzModeClient(threading.Thread):
             # sys.stdout.write(f"\rPublished: Token is: {token}")
             time.sleep(0.1)
 
-    def publish_rsa(self):
-        ser_msg = Rsa_Helper.get_rsa_message() 
+    def publish_rsa(self, rsa_id:str, rsa_desc:str, rsa_pos):
+        rsa_helper = Rsa_Helper()
+        ser_msg = rsa_helper.get_rsa_message(rsa_id, rsa_desc, rsa_pos) 
         print(ser_msg)
         
         # now publish your message (denoted by 'bytes') to VZCV2X/3/IN/SW/NA/ADOT/0/JER/AUTOPUB_ADD

@@ -8,7 +8,7 @@ class Rsa_Helper:
     def __init__(self):
         pass
 
-    def get_rsa_message(self) -> bytes:
+    def get_rsa_message(self, rsa_id:str, rsa_desc:str, rsa_pos) -> bytes:
         #  I don't know the best location to store these as static strings in your Go project.
         #  I left them here for simplicity but they should probably be in a safer, more remote
         #  location, along with any other line crossing RSA messages that you want to send.
@@ -95,15 +95,16 @@ class Rsa_Helper:
         # endPoints := [4]int32 {p0, p1, p2, p3}
         # setRsaLine (lineId, endPoints, jsonRsa1)
         
-        lineId = "BR_MKZ_Reporting"
-        p0 = 334800130
-        p1 = -1120386210
-        p2 = 334800200
-        p3 = -1120381860
+        lineId = rsa_id
+        desc = rsa_desc
+        p0 = rsa_pos['lat_start']
+        p1 = rsa_pos['long_start']
+        p2 = rsa_pos['lat_end']
+        p3 = rsa_pos['long_end']
         endPoints = [p0, p1, p2, p3]
         return self.setRsaLine(lineId, endPoints, jsonRsa1)
         
-    def setRsaLine(lineId:str, endPoints, jsonRsa:str) -> bytes:
+    def setRsaLine(self, lineId:str, endPoints, jsonRsa:str) -> bytes:
 
         now_time = datetime.now()
         # datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0) 

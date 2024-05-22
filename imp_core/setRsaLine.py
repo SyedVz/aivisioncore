@@ -166,11 +166,25 @@ def get_rsa_message() -> bytes:
     # endPoints := [4]int32 {p0, p1, p2, p3}
     # setRsaLine (lineId, endPoints, jsonRsa1)
     
-    lineId = "MKZ_Reporting_Road_Event"
-    p0 = 334800130
-    p1 = -1120386210
-    p2 = 334800200
-    p3 = -1120381860
+    lineId = "Road_Incident_3"
+
+    cam0_pos = {"lat_start":334800130, "long_start":-1120386210, "lat_end": 334800200, "long_end": -1120381860}
+    cam1_pos = {"lat_start":334818970, "long_start":-1120391350, "lat_end": 334819350, "long_end": -1120387270}
+    cam2_pos = {"lat_start":334758540, "long_start":-1120386960, "lat_end": 334758470, "long_end": -1120383050}
+    cam3_pos = {"lat_start":334746880, "long_start":-1120388250, "lat_end": 334746750, "long_end": -1120383210}
+
+    # p0 = 334800130
+    # p1 = -1120386210
+    # p2 = 334800200
+    # p3 = -1120381860
+
+    cam_pos = cam3_pos
+
+    p0 = cam_pos['lat_start']
+    p1 = cam_pos['long_start']
+    p2 = cam_pos['lat_end']
+    p3 = cam_pos['long_end']
+
     endPoints = [p0, p1, p2, p3]
     return setRsaLine(lineId, endPoints, jsonRsa1)
     
