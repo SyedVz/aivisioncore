@@ -13,7 +13,7 @@ import requests
 import json
 
 class MyCar:
-    def __init__(self, stop_event, cv_connect=False):
+    def __init__(self, stop_event, cv_connect=False, route_file_name=None):
         self.localIP     = "127.0.0.1"
         self.localPort   = 6161
         self.bufferSize  = 1024
@@ -25,6 +25,8 @@ class MyCar:
 
         self.msg_q = queue.Queue()
         self.stop_event = stop_event
+
+        self.loc_input_file = route_file_name
 
         if (cv_connect):
             # # Create a datagram socket
@@ -80,7 +82,7 @@ class MyCar:
         client_id = self.register_client()
 
         # Creation of this client also starts sending BSMs messages
-        self.mqtt_client = MqttVzModeClient(self.stop_event, client_id, thread_name="vzmode_veh_car1")
+        self.mqtt_client = MqttVzModeClient(self.stop_event, client_id, thread_name="vzmode_veh_car1", location_file=self.loc_input_file)
 
          # mqtt_client.setDaemon(True)
         self.mqtt_client.start()
@@ -107,7 +109,9 @@ class MyCar:
 def main(args): 
     try:
         main_stop_event = Event()
-        my_car = MyCar(main_stop_event, args.cv_connect)
+        route_file_name = get_route_file_name(args.route)
+        print(f"Route File is: {route_file_name}")
+        my_car = MyCar(main_stop_event, args.cv_connect, route_file_name)
     except KeyboardInterrupt:
         print('Interrupted')
         try:
@@ -115,9 +119,24 @@ def main(args):
         except SystemExit:
             os._exit(130)
 
+def get_route_file_name(loc_input=None)->str:
+    route_file_name = None
+    if (loc_input):
+        if (loc_input == "1" or loc_input == "r1" or loc_input=="route1"):
+            route_file_name = "imp_core/vz_data/routes_1.csv"
+        elif (loc_input == "2" or loc_input == "r2" or loc_input=="route2"):
+            route_file_name = "imp_core/vz_data/routes_2.csv"
+        elif (loc_input == "3" or loc_input == "r3" or loc_input=="route3"):
+            route_file_name = "imp_core/vz_data/routes_3.csv"
+        elif (loc_input == "4" or loc_input == "r4" or loc_input=="route4"):
+            route_file_name = "imp_core/vz_data/routes_4.csv"
+
+    return route_file_name
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Drive Car. Send BSM messages of its location')
     parser.add_argument('--cv_connect', action='store_true',help='Listen to CV messages')
+    parser.add_argument('-r', '--route', type=str, help='Route Number', required=False)
     args = parser.parse_args()
     print(f"cv_connect is : {args.cv_connect}")
 
