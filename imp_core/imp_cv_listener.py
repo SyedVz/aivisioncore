@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 import queue
-from .imp_publishser import MqttIMPClient
+from imp_publishser import MqttIMPClient
 from threading import Event
 
 class UDPServer:
@@ -25,7 +25,7 @@ class UDPServer:
         self.UDPServerSocket.bind((self.localIP, self.localPort))
 
         # Class for registering and sending messages to IMP mqtt
-        self.create_mqtt_client()
+        #self.create_mqtt_client()
 
         t1 = threading.Thread(target=self.server_thread)        
         t1.start()
@@ -38,21 +38,21 @@ class UDPServer:
 
             data, self.client_addr = self.UDPServerSocket.recvfrom(self.bufferSize)
             self.client_available = True
-            # clientMsg = "Message from Client:{}".format(data)
-            # clientIP  = "Client IP Address:{}".format(self.client_addr)
-            # msg = data.decode('utf-8')
-            # print(msg)
+            #clientMsg = "Message from Client:{}".format(data)
+           # clientIP  = "Client IP Address:{}".format(self.client_addr)
+            msg = data.decode('utf-8')
+            print(msg)
 
             if (self.mqtt_client):
                 self.mqtt_client.send_message(data)
 
             time.sleep(0.1)
 
-    def create_mqtt_client(self):
-        self.mqtt_client = MqttIMPClient(self.stop_event)
+   # def create_mqtt_client(self):
+        #self.mqtt_client = MqttIMPClient(self.stop_event)
 
          # mqtt_client.setDaemon(True)
-        self.mqtt_client.start()
+        #self.mqtt_client.start()
 
 def main(): 
     main_stop_event = Event()

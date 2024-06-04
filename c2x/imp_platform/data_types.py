@@ -23,6 +23,8 @@ class DetectionExtents:
 class IncidentsName(Enum):
     explosion = 'explosion'
     accident = 'accident'
+    fogwarning ='fogwarning'
+    congestion ='congestion'
     violation = 'violation'
     notmatching = 'not matching'
     constructionzone = "construction zone"

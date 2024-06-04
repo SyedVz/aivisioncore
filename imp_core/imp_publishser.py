@@ -9,7 +9,7 @@ from paho.mqtt import client as mqtt_client
 import json
 import paho.mqtt.subscribe as mqtt_subscribe
 
-from .routed_msg import georoutedmsg_pb2
+from routed_msg import georoutedmsg_pb2
 
 class MqttIMPClient(threading.Thread):
     def __init__(self, stop_event):

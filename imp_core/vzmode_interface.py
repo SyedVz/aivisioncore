@@ -106,17 +106,17 @@ class MqttVzModeClient(threading.Thread):
 
         incident = jsob_obj.get('Incident', '')
 
-        rsa_id = "GenAI Incident: "
+        rsa_id = "AI Incident: "
         if (incident == "explosion"):
             rsa_id = rsa_id + incident
         elif (incident == "accident"):
             rsa_id = rsa_id + incident
-        elif (incident == "violation"):
+        elif (incident == "fogwarning"):
             rsa_id = rsa_id + incident
-        elif (incident == "construction zone"):
+        elif (incident == "congestion"):
             rsa_id = rsa_id + incident
         else:
-            rsa_id = rsa_id + "Unknown"
+            rsa_id = rsa_id + "Accident"
 
         # print(cam_pos)
         # print(incident)

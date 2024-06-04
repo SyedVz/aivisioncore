@@ -6,7 +6,7 @@ import json
 
 class IMPClient:
     def __init__(self, host, port):
-        self.host = "127.0.0.1" #host
+        self.host = host
 
         self.rsu_port = 7171
         self.car_port = 6161
@@ -40,6 +40,7 @@ class IMPClient:
 
     def send_incident_detection(self, type :IncidentsName, CameraName:str = "None"):
         print(f'Sending incident detection: {type} ')
+        print(f'For Camera : {CameraName} ')
 
         detected_incident = "None"
         if (type):

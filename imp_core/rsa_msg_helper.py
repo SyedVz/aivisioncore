@@ -108,7 +108,7 @@ class Rsa_Helper:
 
         now_time = datetime.now()
         # datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0) 
-        msg_end_time = now_time + timedelta(minutes=2) 
+        msg_end_time = now_time + timedelta(minutes=1)
         
         # utc_now_time = now_time.replace(tzinfo=timezone.utc)
         # utc_msg_end_time = msg_end_time.replace(tzinfo=timezone.utc)
@@ -121,7 +121,7 @@ class Rsa_Helper:
         
         print("Original")
         print(f"Full: {now_time} Seconds: {seconds_now} Nano: {int()}")
-        print(f"Full: {msg_end_time} Seconds: {seconds_end} Nano: {msg_end_time.strftime(('%s'))}")
+     #   print(f"Full: {msg_end_time} Seconds: {seconds_end} Nano: {msg_end_time.strftime(('%s'))}")
         
         print("Nanos")
         print(f"Nanos now: {nanos_now}")
