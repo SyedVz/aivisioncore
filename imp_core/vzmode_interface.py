@@ -18,7 +18,7 @@ from .location_helper import Location_Helper
 default_entity_id = 200             # Used if not registering the client
 
 class MqttVzModeClient(threading.Thread):
-    def __init__(self, stop_event, client_id=0, thread_name="vzmode_rsu"):
+    def __init__(self, stop_event, client_id=0, thread_name="vzmode_rsu", location_file=None):
 
         super().__init__(group=None, name=thread_name)
         self.evt = stop_event
@@ -50,7 +50,10 @@ class MqttVzModeClient(threading.Thread):
         self.vzmode_mqtt_client.on_subscribe = self.on_subscribe
         self.vzmode_mqtt_client.on_disconnect = self.on_disconnect
 
-        self.location_helper = Location_Helper(stop_event)
+        google_route_available = False
+        if(location_file): 
+            google_route_available = True
+        self.location_helper = Location_Helper(stop_event, route_file=location_file, google_route=google_route_available)
 
         # Load BSM data from file
         # self.saved_car_route = None
