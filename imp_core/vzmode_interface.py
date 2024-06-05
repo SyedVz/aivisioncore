@@ -15,6 +15,8 @@ import imp_core.routed_msg_vzmode.routed_msg_pb2 as routed_msg_pb2
 from .rsa_msg_helper import Rsa_Helper
 from .location_helper import Location_Helper
 
+ItisTypes = Rsa_Helper.ItisTypes
+
 default_entity_id = 200             # Used if not registering the client
 
 class MqttVzModeClient(threading.Thread):
@@ -112,19 +114,30 @@ class MqttVzModeClient(threading.Thread):
         rsa_id = "AI Incident: "
         if (incident == "explosion"):
             rsa_id = rsa_id + incident
+            itis_codes = ItisTypes.type_explosion
         elif (incident == "accident"):
             rsa_id = rsa_id + incident
+            itis_codes = ItisTypes.type_accident
         elif (incident == "fogwarning"):
             rsa_id = rsa_id + incident
+            itis_codes = ItisTypes.type_fog
         elif (incident == "congestion"):
             rsa_id = rsa_id + incident
+            itis_codes = ItisTypes.type_congestion
+        elif (incident == "violation"):
+            rsa_id = rsa_id + incident
+            itis_codes = ItisTypes.type_violation
+        elif (incident == "construction zone"):
+            rsa_id = rsa_id + incident
+            itis_codes = ItisTypes.type_construction
         else:
-            rsa_id = rsa_id + "Accident"
+            rsa_id = rsa_id + "Advisory"
+            itis_codes = ItisTypes.type_none
 
         # print(cam_pos)
         # print(incident)
         print(f"Setting RSA line for the incident: {incident}")
-        self.publish_rsa(rsa_id, rsa_id, cam_pos)
+        self.publish_rsa(rsa_id, rsa_id, cam_pos, itis_codes)
 
     def is_connected(self):
         return self.vz_mode_mqtt_is_connected
@@ -195,9 +208,9 @@ class MqttVzModeClient(threading.Thread):
             # sys.stdout.write(f"\rPublished: Token is: {token}")
             time.sleep(0.1)
 
-    def publish_rsa(self, rsa_id:str, rsa_desc:str, rsa_pos):
+    def publish_rsa(self, rsa_id:str, rsa_desc:str, rsa_pos, itis_codes:ItisTypes):
         rsa_helper = Rsa_Helper()
-        ser_msg = rsa_helper.get_rsa_message(rsa_id, rsa_desc, rsa_pos) 
+        ser_msg = rsa_helper.get_rsa_message(rsa_id, rsa_desc, rsa_pos, itis_codes) 
         print(ser_msg)
         
         # now publish your message (denoted by 'bytes') to VZCV2X/3/IN/SW/NA/ADOT/0/JER/AUTOPUB_ADD

@@ -1,21 +1,47 @@
 import time
 from datetime import datetime, timedelta, timezone
+import json
+from enum import Enum
 
 import imp_core.routed_msg_vzmode.routed_msg_pb2 as routed_msg_pb2
 from google.protobuf import timestamp_pb2
 
 class Rsa_Helper:
+
+    class ItisTypes(Enum):
+        type_none = "none"
+        type_explosion = 'explosion'
+        type_accident = 'accident'
+        type_fog = 'fogwarning'
+        type_violation = "violation"
+        type_construction = "construction"
+        type_congestion = "congestion"
+
+        def __str__(self):
+            return f'{self.value}'
+        
     def __init__(self):
-        pass
+        ItisTypes = self.ItisTypes
 
-    def get_rsa_message(self, rsa_id:str, rsa_desc:str, rsa_pos) -> bytes:
-        #  I don't know the best location to store these as static strings in your Go project.
-        #  I left them here for simplicity but they should probably be in a safer, more remote
-        #  location, along with any other line crossing RSA messages that you want to send.
+    def get_rsa_message(self, rsa_id:str, rsa_desc:str, rsa_pos, itis_type:ItisTypes=ItisTypes.type_none) -> bytes:
 
-        #  ****** Reduced Speed Ahead Slow Down ******
-        jsonRsa1 = '''
-        {
+        # Check document(J2540_2) page 215 for examples of proper encoding
+
+        # Previous codes
+        ITIScodes_Reduced_Speed = ["12302", "268", "13569", "7201"]                     # Reduced Speed Ahead Slow Down
+        ITIScodes_Slow_Traffic = ["259", "13569", "7714", "12330"]                      # Slow Traffic Ahead Proceed With Caution
+        ITIScodes_Delay = ["1537", "12554", "8728", "1537", "11781", "12554", "7997"]   # Delay 10 Minute Delay Interstate 10 Westbound Traffic
+
+        # New codes for the demo
+        ITIScodes_None = ["6922", "7169"]                                               # increased-risk-of-accident drive-carefully 
+        ITIScodes_Explosion = ["3102", "8449"]                                          # major-hazardous-materials-fire detour-where-possible 
+        ITIScodes_Accident = ["517", "13569", "7443", "7201"]                           # multi-vehicle-accident reduce-your-speed be-prepared-to-stop
+        ITIScodes_Fog = ["5383", "7714", "12330"]                                       # visibility-reduced proceed-with caution
+        ITIScodes_Violation = ITIScodes_None
+        ITIScodes_Construction = ["7941", "7443"]                                       # in-road-construction-area reduce-your-speed
+        ITIScodes_Congestion = ["263", "7201"]                                          # traffic-congestion be-prepared-to-stop                    
+
+        jsonRsa = {
             "MessageFrame":{
                 "messageId":"27",
                 "value":{
@@ -24,76 +50,35 @@ class Rsa_Helper:
                         "timeStamp":"0",
                         "typeEvent":261,
                         "description":{
-                            "ITIScodes": ["12302", "268", "13569", "7201"]
+                            "ITIScodes": []
                         }
                     }
                 }
             } 
         }
-        
-        '''
 
-        # Check document(J2540_2) page 215 for examples of proper encoding
+        ItisTypes = self.ItisTypes
 
-        # ****** Slow Traffic Ahead Proceed With Caution ******
-        # jsonRsa2 = 
-        # {
-        #     "MessageFrame":{
-        #         "messageId":"27",
-        #         "value":{
-        #             "RoadSideAlert":{
-        #                 "msgCnt":"0",
-        #                 "timeStamp":"0",
-        #                 "typeEvent":261,
-        #                 "description":{
-        #                     "ITIScodes": ["259", "13569", "7714", "12330"]
-        #                 }
-        #             }
-        #         }
-        #     }
-        # }
+        if (itis_type == ItisTypes.type_explosion):
+            itis_codes_to_send = ITIScodes_Explosion
+        elif (itis_type == ItisTypes.type_accident):
+            itis_codes_to_send = ITIScodes_Accident
+        elif (itis_type == ItisTypes.type_fog):
+            itis_codes_to_send = ITIScodes_Fog
+        elif (itis_type == ItisTypes.type_congestion):
+            itis_codes_to_send = ITIScodes_Congestion
+        elif (itis_type == ItisTypes.type_construction):
+            itis_codes_to_send = ITIScodes_Construction
+        elif (itis_type == ItisTypes.type_violation):
+            itis_codes_to_send = ITIScodes_Violation
+        else:
+            itis_codes_to_send = ITIScodes_None
 
-        # ****** Delay 10 Minute Delay Interstate 10 Westbound Traffic ******
-        # jsonRsa3 = 
-        # {
-        #     "MessageFrame":{
-        #         "messageId":"27",
-        #         "value":{
-        #             "RoadSideAlert":{
-        #                 "msgCnt":"0",
-        #                 "timeStamp":"0",
-        #                 "typeEvent":261,
-        #                 "description":{
-        #                     "ITIScodes": ["1537", "12554", "8728", "1537", "11781", "12554", "7997"]
-        #                 }
-        #             }
-        #         }
-        #     }
-        # }
+        jsonRsa["MessageFrame"]["value"]["RoadSideAlert"]["description"]["ITIScodes"] = itis_codes_to_send  # change it to anything above for testing
 
 
         # var p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 int32 = 0,0,0,0,0,0,0,0,0,0,0,0
         p0, p1, p2, p3 = 0, 0, 0, 0
-
-        # lineId = "inrixIncidentID_1"
-        # endPoints = [4]int32 {p0, p1, p2, p3}
-        # setRsaLine (lineId, endPoints, jsonRsa1)
-
-        # lineId = "inrixIncidentID_2"
-        # endPoints = [4]int32 {p4, p5, p6, p7}
-        # setRsaLine (lineId, endPoints, jsonRsa2)
-
-        # lineId = "inrixIncidentID_3"
-        # endPoints = [4]int32 {p8, p9, p10, p11}
-        # setRsaLine (lineId, endPoints, jsonRsa3)
-
-        # lineId = "Test_IncidentID_1"
-        # p0 = 334800020
-        # p1 = -1120383930
-        # p2 = 334799823
-        # p3 = -1120382324
-        # endPoints := [4]int32 {p0, p1, p2, p3}
-        # setRsaLine (lineId, endPoints, jsonRsa1)
         
         lineId = rsa_id
         desc = rsa_desc
@@ -102,7 +87,7 @@ class Rsa_Helper:
         p2 = rsa_pos['lat_end']
         p3 = rsa_pos['long_end']
         endPoints = [p0, p1, p2, p3]
-        return self.setRsaLine(lineId, endPoints, jsonRsa1)
+        return self.setRsaLine(lineId, endPoints, json.dumps(jsonRsa))
         
     def setRsaLine(self, lineId:str, endPoints, jsonRsa:str) -> bytes:
 

@@ -2,7 +2,7 @@ from paho.mqtt import client as mqtt_client
 import paho.mqtt.subscribe as mqtt_subscribe
 import time
 from datetime import datetime, timedelta, timezone
-
+import json
 
 import sys, time, threading, abc, signal
 from threading import Event
@@ -80,13 +80,24 @@ class MqttClient(threading.Thread):
         print(f"Published: Token is: {token}")
         
 def get_rsa_message() -> bytes:
-    #  I don't know the best location to store these as static strings in your Go project.
-    #  I left them here for simplicity but they should probably be in a safer, more remote
-    #  location, along with any other line crossing RSA messages that you want to send.
 
-    #  ****** Reduced Speed Ahead Slow Down ******
-    jsonRsa1 = '''
-    {
+   # Check document(J2540_2) page 215 for examples of proper encoding
+
+    # Previous codes
+    ITIScodes_Reduced_Speed = ["12302", "268", "13569", "7201"]                     # Reduced Speed Ahead Slow Down
+    ITIScodes_Slow_Traffic = ["259", "13569", "7714", "12330"]                      # Slow Traffic Ahead Proceed With Caution
+    ITIScodes_Delay = ["1537", "12554", "8728", "1537", "11781", "12554", "7997"]   # Delay 10 Minute Delay Interstate 10 Westbound Traffic
+
+    # New codes for the demo
+    ITIScodes_None = ["6922", "7169"]                                               # increased-risk-of-accident drive-carefully 
+    ITIScodes_Explosion = ["3102", "8449"]                                          # major-hazardous-materials-fire detour-where-possible 
+    ITIScodes_Accident = ["517", "13569", "7443", "7201"]                           # multi-vehicle-accident ahead reduce-your-speed be-prepared-to-stop
+    ITIScodes_Fog = ["5383", "7714", "12330"]                                       # visibility-reduced proceed-with caution
+    ITIScodes_Violation = ITIScodes_None
+    ITIScodes_Construction = ["7941", "7443"]                                       # in-road-construction-area reduce-your-speed
+    ITIScodes_Congestion = ["263", "7201"]                                          # traffic-congestion be-prepared-to-stop                    
+
+    jsonRsa = {
         "MessageFrame":{
             "messageId":"27",
             "value":{
@@ -95,78 +106,19 @@ def get_rsa_message() -> bytes:
                     "timeStamp":"0",
                     "typeEvent":261,
                     "description":{
-                        "ITIScodes": ["12302", "268", "13569", "7201"]
+                        "ITIScodes": []
                     }
                 }
             }
         } 
     }
-    
-    '''
 
-    # Check document(J2540_2) page 215 for examples of proper encoding
-
-    # ****** Slow Traffic Ahead Proceed With Caution ******
-    # jsonRsa2 = 
-    # {
-    #     "MessageFrame":{
-    #         "messageId":"27",
-    #         "value":{
-    #             "RoadSideAlert":{
-    #                 "msgCnt":"0",
-    #                 "timeStamp":"0",
-    #                 "typeEvent":261,
-    #                 "description":{
-    #                     "ITIScodes": ["259", "13569", "7714", "12330"]
-    #                 }
-    #             }
-    #         }
-    #     }
-    # }
-
-    # ****** Delay 10 Minute Delay Interstate 10 Westbound Traffic ******
-    # jsonRsa3 = 
-    # {
-    #     "MessageFrame":{
-    #         "messageId":"27",
-    #         "value":{
-    #             "RoadSideAlert":{
-    #                 "msgCnt":"0",
-    #                 "timeStamp":"0",
-    #                 "typeEvent":261,
-    #                 "description":{
-    #                     "ITIScodes": ["1537", "12554", "8728", "1537", "11781", "12554", "7997"]
-    #                 }
-    #             }
-    #         }
-    #     }
-    # }
-
+    jsonRsa["MessageFrame"]["value"]["RoadSideAlert"]["description"]["ITIScodes"] = ITIScodes_Explosion  # change it to anything above for testing
 
     # var p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 int32 = 0,0,0,0,0,0,0,0,0,0,0,0
     p0, p1, p2, p3 = 0, 0, 0, 0
-
-    # lineId = "inrixIncidentID_1"
-    # endPoints = [4]int32 {p0, p1, p2, p3}
-    # setRsaLine (lineId, endPoints, jsonRsa1)
-
-    # lineId = "inrixIncidentID_2"
-    # endPoints = [4]int32 {p4, p5, p6, p7}
-    # setRsaLine (lineId, endPoints, jsonRsa2)
-
-    # lineId = "inrixIncidentID_3"
-    # endPoints = [4]int32 {p8, p9, p10, p11}
-    # setRsaLine (lineId, endPoints, jsonRsa3)
-
-    # lineId = "Test_IncidentID_1"
-    # p0 = 334800020
-    # p1 = -1120383930
-    # p2 = 334799823
-    # p3 = -1120382324
-    # endPoints := [4]int32 {p0, p1, p2, p3}
-    # setRsaLine (lineId, endPoints, jsonRsa1)
     
-    lineId = "Road_Incident_3"
+    lineId = "Road_Incident_New"
 
     cam0_pos = {"lat_start":334800130, "long_start":-1120386210, "lat_end": 334800200, "long_end": -1120381860}
     cam1_pos = {"lat_start":334818970, "long_start":-1120391350, "lat_end": 334819350, "long_end": -1120387270}
@@ -186,13 +138,13 @@ def get_rsa_message() -> bytes:
     p3 = cam_pos['long_end']
 
     endPoints = [p0, p1, p2, p3]
-    return setRsaLine(lineId, endPoints, jsonRsa1)
+    return setRsaLine(lineId, endPoints, json.dumps(jsonRsa))
     
 def setRsaLine(lineId:str, endPoints, jsonRsa:str) -> bytes:
 
     now_time = datetime.now()
     # datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0) 
-    msg_end_time = now_time + timedelta(minutes=5) 
+    msg_end_time = now_time + timedelta(minutes=2) 
      
     # utc_now_time = now_time.replace(tzinfo=timezone.utc)
     # utc_msg_end_time = msg_end_time.replace(tzinfo=timezone.utc)
