@@ -28,6 +28,7 @@ class IncidentsName(Enum):
     violation = 'violation'
     notmatching = 'not matching'
     constructionzone = "construction zone"
+    custom_1 = "custom_incident_1"
 
     def __str__(self):
         return f'{self.value}'

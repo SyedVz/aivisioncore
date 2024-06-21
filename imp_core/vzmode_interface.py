@@ -130,6 +130,9 @@ class MqttVzModeClient(threading.Thread):
         elif (incident == "construction zone"):
             rsa_id = rsa_id + incident
             itis_codes = ItisTypes.type_construction
+        elif (incident == "custom_incident_1"):
+            rsa_id = rsa_id + incident
+            itis_codes = ItisTypes.type_custom_incident_1
         else:
             rsa_id = rsa_id + "Advisory"
             itis_codes = ItisTypes.type_none

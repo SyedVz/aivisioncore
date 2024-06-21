@@ -95,8 +95,9 @@ def get_rsa_message() -> bytes:
     ITIScodes_Fog = ["5383", "7714", "12330"]                                       # visibility-reduced proceed-with caution
     ITIScodes_Violation = ITIScodes_None
     ITIScodes_Construction = ["7941", "7443"]                                       # in-road-construction-area reduce-your-speed
-    ITIScodes_Congestion = ["263", "7201"]                                          # traffic-congestion be-prepared-to-stop                    
-
+    ITIScodes_Congestion = ["263", "7201"]                                          # traffic-congestion be-prepared-to-stop   
+    ITIScodes_Custom_Incident = ["9999"]                                          # traffic-congestion be-prepared-to-stop                    
+                 
     jsonRsa = {
         "MessageFrame":{
             "messageId":"27",
@@ -113,7 +114,7 @@ def get_rsa_message() -> bytes:
         } 
     }
 
-    jsonRsa["MessageFrame"]["value"]["RoadSideAlert"]["description"]["ITIScodes"] = ITIScodes_Explosion  # change it to anything above for testing
+    jsonRsa["MessageFrame"]["value"]["RoadSideAlert"]["description"]["ITIScodes"] = ITIScodes_Custom_Incident  # change it to anything above for testing
 
     # var p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 int32 = 0,0,0,0,0,0,0,0,0,0,0,0
     p0, p1, p2, p3 = 0, 0, 0, 0

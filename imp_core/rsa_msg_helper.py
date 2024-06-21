@@ -16,6 +16,7 @@ class Rsa_Helper:
         type_violation = "violation"
         type_construction = "construction"
         type_congestion = "congestion"
+        type_custom_incident_1 = "custom_incident_1"
 
         def __str__(self):
             return f'{self.value}'
@@ -35,11 +36,12 @@ class Rsa_Helper:
         # New codes for the demo
         ITIScodes_None = ["6922", "7169"]                                               # increased-risk-of-accident drive-carefully 
         ITIScodes_Explosion = ["3102", "8449"]                                          # major-hazardous-materials-fire detour-where-possible 
-        ITIScodes_Accident = ["517", "13569", "7443", "7201"]                           # multi-vehicle-accident reduce-your-speed be-prepared-to-stop
+        ITIScodes_Accident = ["517", "13569", "7443", "7201"]                           # multi-vehicle-accident ahead reduce-your-speed be-prepared-to-stop
         ITIScodes_Fog = ["5383", "7714", "12330"]                                       # visibility-reduced proceed-with caution
         ITIScodes_Violation = ITIScodes_None
         ITIScodes_Construction = ["7941", "7443"]                                       # in-road-construction-area reduce-your-speed
-        ITIScodes_Congestion = ["263", "7201"]                                          # traffic-congestion be-prepared-to-stop                    
+        ITIScodes_Congestion = ["263", "7201"]                                          # traffic-congestion be-prepared-to-stop
+        ITIScodes_Custom_Incident = ["9999"]                                            # custom incident 1
 
         jsonRsa = {
             "MessageFrame":{
@@ -71,6 +73,8 @@ class Rsa_Helper:
             itis_codes_to_send = ITIScodes_Construction
         elif (itis_type == ItisTypes.type_violation):
             itis_codes_to_send = ITIScodes_Violation
+        elif (itis_type == ItisTypes.type_custom_incident_1):
+            itis_codes_to_send = ITIScodes_Custom_Incident
         else:
             itis_codes_to_send = ITIScodes_None
 
