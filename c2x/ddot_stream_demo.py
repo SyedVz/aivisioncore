@@ -29,17 +29,18 @@ from .imp_platform.data_types import *
 #            'SCAM213','SCAM182','SCAM012','SCAM003','PCAM4061','SCAM144','SCAM011','SCAM208','SCAM177','SCAM014','SCAM194']
 
 
-#CamList = ['NCAM001', 'NCAM006',
- #       'data/out_truck.mp4',
- #         'NCAM159', 'data/nighttime_2.mp4',
-  #         'data/fog_SCAM003_20240507-051038.mp4',
-   #        'NCAM204', 'NCAM167', 'data/traffic_KCAM030_20240507-103904.mp4','SCAM144', 'NCAM197', 'NCAM209',
-   #       'NCAM088', 'KCAM001', 'KCAM174', 'SCAM199', ] #'SCAM170' #'KCAM129', 'KCAM004']
+CamList = ['NCAM001', 'NCAM006',
+        'data/out_truck.mp4',
+          'NCAM159', 'data/nighttime_2.mp4',
+         'data/fog_SCAM003_20240507-051038.mp4',
+           'NCAM204', 'NCAM167', 'data/traffic_KCAM030_20240507-103904.mp4','SCAM144', 'NCAM197', 'NCAM209',
+          'NCAM088', 'KCAM001', 'KCAM174', 'SCAM199', ] #'SCAM170' #'KCAM129', 'KCAM004']
 #
 
          #'KCAM170', 'KCAM180', 'KCAM027', 'KCAM086', 'KCAM110', 'KCAM162', 'KCAM028', 'KCAM029', 'KCAM030']
 #CamList = ['NCAM001', 'NCAM006','KCAM001', 'KCAM174','data/out_CCTVtruck.mp4']
-CamList = ['data/out_CCTVtruck.mp4', 'data/nighttime_2.mp4', 'data/fog_SCAM011_20240507-033640.mp4']
+#CamList = ['data/out_CCTVtruck.mp4', 'data/nighttime_2.mp4', 'data/fog_SCAM011_20240507-033640.mp4']
+#CamList = ['data/nighttime_2.mp4', 'data/fog_SCAM011_20240507-033640.mp4']
 #CamList = ['data/nighttime_2.mp4']
 # CamList = ['KCAM001', 'KCAM174']
 # CamList = ['PCAM4061']
@@ -47,7 +48,7 @@ CamList = ['data/out_CCTVtruck.mp4', 'data/nighttime_2.mp4', 'data/fog_SCAM011_2
 
 headless = False
 exit_flag, ui_flag, streams_loaded_flag, IMP_flag = False, False, False, False
-aspect_wide, aspect_tall, scl = 580, 650, 1.0
+aspect_wide, aspect_tall, scl = 580, 650, 1.25
 vid_h = aspect_tall
 compos_h, compos_w, mgn, dx = int(vid_h * scl), int(1080 * scl), 5, int(np.ceil(math.sqrt(len(CamList))))
 preview_h, preview_w = compos_h // dx - mgn, compos_w // dx - mgn
