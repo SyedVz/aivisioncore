@@ -18,7 +18,7 @@ class MqttClient(threading.Thread):
         self.evt = stop_event
 
         self.vzmode_mqtt_client = None
-        self.vz_mode_mqtt_broker_address = "vzmode.las.wl.dltdemo.io"
+        self.vz_mode_mqtt_broker_address = "vzmode.nyc.wl.dltdemo.io"
         self.vz_mode_mqtt_broker_port = 31234
 
         # Pub topics
@@ -35,7 +35,7 @@ class MqttClient(threading.Thread):
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:    
-            print("Connected to LAS Vzmode")   
+            print("Connected to NYC Vzmode")   
             self.publish_rsa()
             # All done. Now disconnect
             self.vzmode_mqtt_client.disconnect()
@@ -114,7 +114,7 @@ def get_rsa_message() -> bytes:
         } 
     }
 
-    jsonRsa["MessageFrame"]["value"]["RoadSideAlert"]["description"]["ITIScodes"] = ITIScodes_Custom_Incident  # change it to anything above for testing
+    jsonRsa["MessageFrame"]["value"]["RoadSideAlert"]["description"]["ITIScodes"] = ITIScodes_Explosion  # change it to anything above for testing
 
     # var p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 int32 = 0,0,0,0,0,0,0,0,0,0,0,0
     p0, p1, p2, p3 = 0, 0, 0, 0
@@ -145,7 +145,7 @@ def setRsaLine(lineId:str, endPoints, jsonRsa:str) -> bytes:
 
     now_time = datetime.now()
     # datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0) 
-    msg_end_time = now_time + timedelta(minutes=2) 
+    msg_end_time = now_time + timedelta(minutes=5) 
      
     # utc_now_time = now_time.replace(tzinfo=timezone.utc)
     # utc_msg_end_time = msg_end_time.replace(tzinfo=timezone.utc)

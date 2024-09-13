@@ -32,10 +32,10 @@ class MqttVzModeClient(threading.Thread):
             self.entity_id =  default_entity_id
 
         self.vzmode_mqtt_client = None
-        self.vz_mode_mqtt_broker_address = "vzmode.las.wl.dltdemo.io"
+        self.vz_mode_mqtt_broker_address = "vzmode.nyc.wl.dltdemo.io"
         self.vz_mode_mqtt_broker_port = 31234
         self.vz_mode_mqtt_is_connected = False
-        self.vz_mode_crs_url = "http://vzmode.las.wl.dltdemo.io:30413/registration"
+        self.vz_mode_crs_url = "http://vzmode.nyc.wl.dltdemo.io:30413/registration"
 
         # Pub topics
         self.MQTT_BSM_UPER = f"VZCV2X/3/IN/VEH/PSGR/MCAS/{self.entity_id}/UPER/BSM"
@@ -147,7 +147,7 @@ class MqttVzModeClient(threading.Thread):
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            print("Connected to LAS Vzmode")
+            print("Connected to NYC Vzmode")
             self.vz_mode_mqtt_is_connected = True
             # threading.Thread(target=self.publish_bsm).start()
             self.vzmode_mqtt_client.subscribe(self.MQTT_RSA_SUB, 0)
@@ -208,7 +208,7 @@ class MqttVzModeClient(threading.Thread):
             routed_msg = self.get_bsm_message()
             token = self.vzmode_mqtt_client.publish(self.MQTT_BSM_UPER, routed_msg, qos=0, retain=False)
             # print(f"\rPublished: Token is: {token}")
-            # sys.stdout.write(f"\rPublished: Token is: {token}")
+            sys.stdout.write(f"\rPublished: Token is: {token}")
             time.sleep(0.1)
 
     def publish_rsa(self, rsa_id:str, rsa_desc:str, rsa_pos, itis_codes:ItisTypes):

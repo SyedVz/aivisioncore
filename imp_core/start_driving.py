@@ -90,7 +90,7 @@ class MyCar:
     def register_client(self) -> int:
     
         client_entity_id = 0
-        vz_mode_crs_url = "http://vzmode.las.wl.dltdemo.io:30413/registration"
+        vz_mode_crs_url = "http://vzmode.nyc.wl.dltdemo.io:30413/registration"
 
         try:
             client_data = { "ClientInformation":{ "EntityType":"VEH", "EntitySubtype":"PSGR", "VendorID":"MCAS" }, "BSM":{ "MsgFormat":"UPER" }, "RSA":{ "MsgFormat":"UPER" }, "PSM":{ "MsgFormat":"UPER" }, "MAP":{ "MsgFormat":"UPER" }, "SPAT":{ "MsgFormat":"UPER" } }
