@@ -1,0 +1,22 @@
+V2X OBU application installation
+
+
+Requirements
+
+Android phone with Android version 9 and above (5G connected directly or through a hotspot or 5G Fixed wireless network)
+adb
+v2x-obu-debug.apk (debug version of the V2X OBU application)
+vzx.ini file for updating the configuration
+telemetry_inpu.csv file for canned location data
+
+Installation
+
+adb install -t v2x-obu-debug.apk
+Launch the “V2X OBU” application on the phone
+Kill the “V2X OBU” application
+adb push v2x.ini /storage/self/primary/Android/data/com.verizon.v2xobu/files/
+adb push telemetry_input.csv /storage/self/primary/Android/data/com.verizon.v2xobu/files/
+
+Note 1: Without steps 2 and 3, the steps 4 and 5 might fail for a new installation, because the required folder structure is created only after the first launch of the application. So, after step 1, launch the “V2X OBU” application once to be able to successfully perform step 4 and step 5
+
+Note 2: Always force stop the application if you want to restart the application (because the app is not just the UI but services as well, merely killing the UI doesn’t restart the background services)
