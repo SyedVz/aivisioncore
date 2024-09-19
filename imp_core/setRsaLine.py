@@ -18,8 +18,10 @@ class MqttClient(threading.Thread):
         self.evt = stop_event
 
         self.vzmode_mqtt_client = None
-        self.vz_mode_mqtt_broker_address = "vzmode.nyc.wl.dltdemo.io"
-        self.vz_mode_mqtt_broker_port = 31234
+        # self.vz_mode_mqtt_broker_address = "vzmode.nyc.wl.dltdemo.io"
+        # self.vz_mode_mqtt_broker_port = 31234
+        self.vz_mode_mqtt_broker_address = "mqtt.vzmode-br.dltdemo.io"
+        self.vz_mode_mqtt_broker_port = 1883
 
         # Pub topics
         self.MQTT_BSM = "VZCV2X/3/IN/SW/NA/ADOT/0/JER/AUTOPUB_ADD"  
@@ -35,7 +37,7 @@ class MqttClient(threading.Thread):
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:    
-            print("Connected to NYC Vzmode")   
+            print("Connected to vzmode-br Vzmode")   
             self.publish_rsa()
             # All done. Now disconnect
             self.vzmode_mqtt_client.disconnect()

@@ -40,10 +40,13 @@ class MqttClient(threading.Thread):
         super().__init__(group=None, name='vzmode_client_test')
         self.evt = stop_event
 
+        
+        # host_addr = "vzmode.las.wl.dltdemo.io"
+        # host_port = 31234
         # host_addr = "imp.lite.dltdemo.io"
-        host_addr = "vzmode.las.wl.dltdemo.io"
-        # host_port = 1883
-        host_port = 31234
+        host_addr = "mqtt.vzmode-br.dltdemo.io"
+        host_port = 1883
+       
         entity_id = 38
 
         self.vzmode_mqtt_client = None
@@ -126,7 +129,8 @@ class MqttClient(threading.Thread):
 
 def register_client():
     
-    crs_url = "http://vzmode.las.wl.dltdemo.io:30413/registration"
+    # crs_url = "http://vzmode.las.wl.dltdemo.io:30413/registration"
+    crs_url = "http://reg.vzmode-br.dltdemo.io/registration"
     client_data = { "ClientInformation":{ "EntityType":"VEH", "EntitySubtype":"PSGR", "VendorID":"MCAS" }, "RSA":{ "MsgFormat":"UPER" }, "PSM":{ "MsgFormat":"UPER" }, "MAP":{ "MsgFormat":"UPER" }, "SPAT":{ "MsgFormat":"UPER" } }
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     r = requests.post(crs_url, data=json.dumps(client_data), headers=headers)

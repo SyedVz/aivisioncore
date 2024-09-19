@@ -3,7 +3,8 @@ import json
 
 def register_client():
     
-    crs_url = "http://vzmode.nyc.wl.dltdemo.io:30413/registration"
+    # crs_url = "http://vzmode.nyc.wl.dltdemo.io:30413/registration"
+    crs_url = "http://reg.vzmode-br.dltdemo.io/registration"
     client_data = { "ClientInformation":{ "EntityType":"VEH", "EntitySubtype":"PSGR", "VendorID":"MCAS" }, "BSM":{ "MsgFormat":"UPER" }, "RSA":{ "MsgFormat":"UPER" }, "PSM":{ "MsgFormat":"UPER" }, "MAP":{ "MsgFormat":"UPER" }, "SPAT":{ "MsgFormat":"UPER" } }
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     r = requests.post(crs_url, data=json.dumps(client_data), headers=headers)

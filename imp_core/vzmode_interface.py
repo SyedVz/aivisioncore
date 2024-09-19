@@ -32,10 +32,13 @@ class MqttVzModeClient(threading.Thread):
             self.entity_id =  default_entity_id
 
         self.vzmode_mqtt_client = None
-        self.vz_mode_mqtt_broker_address = "vzmode.nyc.wl.dltdemo.io"
-        self.vz_mode_mqtt_broker_port = 31234
+        # self.vz_mode_mqtt_broker_address = "vzmode.nyc.wl.dltdemo.io"
+        # self.vz_mode_mqtt_broker_port = 31234
+        self.vz_mode_mqtt_broker_address = "mqtt.vzmode-br.dltdemo.io"
+        self.vz_mode_mqtt_broker_port = 1883
         self.vz_mode_mqtt_is_connected = False
-        self.vz_mode_crs_url = "http://vzmode.nyc.wl.dltdemo.io:30413/registration"
+        # self.vz_mode_crs_url = "http://vzmode.nyc.wl.dltdemo.io:30413/registration"
+        self.vz_mode_crs_url = "http://reg.vzmode-br.dltdemo.io/registration"
 
         # Pub topics
         self.MQTT_BSM_UPER = f"VZCV2X/3/IN/VEH/PSGR/MCAS/{self.entity_id}/UPER/BSM"
