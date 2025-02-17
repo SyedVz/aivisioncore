@@ -51,12 +51,17 @@ This project contains the codebase for c2x
     ```bash
     python3 -m imp_core.start_driving
     ```
+4. To start the camera panel
+
+
+    ```bash
+    python3 -m c2x.ddot_start_driving
 
 Note: For Step 3: 
     (a) If using imp-lite, please make sure your public IP is whitelisted in imp-lite (if that is used as the imp server)
     (b) If using vzmode, make sure you are connected to a 5G network (or through a 5G hotspot)
     (c) For vzmode, you can monitor the car's movement in the following link:
-        http://vzmode.las.wl.dltdemo.io:30888/
+        ](http://dotfrontend.vzmode-br.dltdemo.io/)
 
 ### Docker
 The testapp can be run as a docker container
